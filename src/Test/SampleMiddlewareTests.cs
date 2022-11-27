@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using Xunit.Abstractions;
 
 namespace Test
 {
@@ -18,6 +19,13 @@ namespace Test
 
     public class SampleMiddlewareTests
     {
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public SampleMiddlewareTests(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
         [Fact]
         async Task Setting_culture_to_Italian_returns_expected_result()
         {
@@ -33,12 +41,9 @@ namespace Test
                 {
                     app.UseRequestCulture();
                     app.UseRouting();
-                    app.UseEndpoints(builder =>
-                    {
-                        builder.MapControllers();
-                    });
+                    app.UseEndpoints(builder => { builder.MapControllers(); });
                 }
-            );
+            ) {TestOutputHelper = _testOutputHelper};
 
             var client = factory.CreateClient();
             var response = await client.GetAsync("/api/sample?culture=en-US");
@@ -63,12 +68,9 @@ namespace Test
                 {
                     app.UseRequestCulture();
                     app.UseRouting();
-                    app.UseEndpoints(builder =>
-                    {
-                        builder.MapControllers();
-                    });
+                    app.UseEndpoints(builder => { builder.MapControllers(); });
                 }
-            );
+            ) {TestOutputHelper = _testOutputHelper};
 
             var client = factory.CreateClient();
             var response = await client.GetAsync("/api/sample?culture=it-IT");
