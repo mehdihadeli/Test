@@ -1,8 +1,5 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
-using System.Text;
 
 namespace Test
 {
@@ -22,7 +19,7 @@ namespace Test
     public class SampleMiddlewareTests
     {
         [Fact]
-        async Task Setting_cultutre_to_Italian_returns_expected_result()
+        async Task Setting_culture_to_Italian_returns_expected_result()
         {
             var factory = new WebApplicationFactoryWithHost<Dummy>
             (
@@ -52,7 +49,7 @@ namespace Test
         }
 
         [Fact]
-        async Task Setting_no_cultutre_returns_default_EN_result()
+        async Task Setting_no_culture_returns_default_EN_result()
         {
             var factory = new WebApplicationFactoryWithHost<Dummy>
             (

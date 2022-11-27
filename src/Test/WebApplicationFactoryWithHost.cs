@@ -1,8 +1,4 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace Test;
 
@@ -10,18 +6,18 @@ class WebApplicationFactoryWithHost<TEntryPoint> :
     WebApplicationFactory<TEntryPoint>
     where TEntryPoint : class
 {
-    Action<IServiceCollection> configureServices;
-    Action<IApplicationBuilder> configure;
-    string[] args;
+    private readonly Action<IServiceCollection> configureServices;
+    readonly Action<IApplicationBuilder> configure;
+    readonly string[] args;
 
-    public Action<IHostBuilder> HostBuilderCustomization { get; set; }
-    public Action<IWebHostBuilder> WebHostBuilderCustomization { get; set; }
+    public Action<IHostBuilder>? HostBuilderCustomization { get; set; }
+    public Action<IWebHostBuilder>? WebHostBuilderCustomization { get; set; }
 
-    public WebApplicationFactoryWithHost(Action<IServiceCollection> configureServices, Action<IApplicationBuilder> configure, string[] args = null)
+    public WebApplicationFactoryWithHost(Action<IServiceCollection> configureServices, Action<IApplicationBuilder> configure, string[]? args = null)
     {
         this.configureServices = configureServices;
         this.configure = configure;
-        this.args = args ?? new string[0];
+        this.args = args ?? Array.Empty<string>();
     }
 
     protected override IHostBuilder CreateHostBuilder()
