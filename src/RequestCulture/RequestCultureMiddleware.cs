@@ -1,7 +1,7 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Http;
 
-namespace test;
+namespace RequestCulture;
 
 public class RequestCultureMiddleware
 {
@@ -12,7 +12,7 @@ public class RequestCultureMiddleware
         _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context)
+    public Task InvokeAsync(HttpContext context)
     {
         var cultureQuery = context.Request.Query["culture"];
         if (!string.IsNullOrWhiteSpace(cultureQuery))
@@ -22,6 +22,6 @@ public class RequestCultureMiddleware
             CultureInfo.CurrentUICulture = culture;
         }
 
-        _next(context);
+        return _next(context);
     }
 }

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace test;
+namespace RequestCulture;
 
 public static class RequestCultureMiddlewareExtensions
 {
