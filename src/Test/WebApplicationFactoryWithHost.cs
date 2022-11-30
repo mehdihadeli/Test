@@ -4,6 +4,10 @@ using Xunit.Abstractions;
 
 namespace Test;
 
+/// <summary>
+/// This WebApplicationFactory only use for testing web components without needing Program entrypoint and it doesn't work for web app with Program file and for this case we should use original WebApplicationFactory.
+/// </summary>
+/// <typeparam name="TEntryPoint"></typeparam>
 class WebApplicationFactoryWithHost<TEntryPoint> :
     WebApplicationFactory<TEntryPoint>
     where TEntryPoint : class
@@ -26,12 +30,6 @@ class WebApplicationFactoryWithHost<TEntryPoint> :
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        // // this override default app configure setup
-        builder.Configure(appBuilder =>
-        {
-            // change existing configurations ...
-        });
-
         builder.ConfigureServices(services =>
         {
             // change existing services ...
@@ -45,7 +43,7 @@ class WebApplicationFactoryWithHost<TEntryPoint> :
         });
     }
 
-    // This creates a new host, even there is no program file (EntryPoint) for finding the CreateDefaultBuilder
+    // This creates a new host, when there is no program file (EntryPoint) for finding the CreateDefaultBuilder - this approach use for testing web components without startup or program
     protected override IHostBuilder CreateHostBuilder()
     {
         var hostBuilder = Host.CreateDefaultBuilder(args);
