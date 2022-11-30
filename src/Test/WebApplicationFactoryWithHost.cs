@@ -41,6 +41,11 @@ class WebApplicationFactoryWithHost<TEntryPoint> :
         {
             // change existing services ...
         });
+
+        builder.Configure(app =>
+        {
+            // change application builder
+        });
     }
 
     // This creates a new host, when there is no program file (EntryPoint) for finding the CreateDefaultBuilder - this approach use for testing web components without startup or program
