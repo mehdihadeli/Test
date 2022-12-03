@@ -37,9 +37,6 @@ class WebApplicationFactoryWithHost<TEntryPoint> :
             // change existing services ...
             if (TestOutputHelper != null)
                 services.AddLogging(b => b.AddXUnit(TestOutputHelper));
-
-            //https://github.com/dotnet/aspnetcore/issues/45319#issuecomment-1334355103
-            services.AddSingleton(configure);
         });
 
         builder.ConfigureTestServices(services =>
@@ -50,9 +47,10 @@ class WebApplicationFactoryWithHost<TEntryPoint> :
         //https://github.com/dotnet/aspnetcore/issues/45319
         builder.Configure(app =>
         {
+            //https://github.com/dotnet/aspnetcore/issues/37680#issuecomment-1331559463
             //https://github.com/dotnet/aspnetcore/issues/45319#issuecomment-1334355103
-            //calling test configure setup first
-            app.ApplicationServices.GetService<Action<IApplicationBuilder>>()?.Invoke(app);
+            //calling test configure setup first and then setup other configuration
+            app.AddTestApplicationBuilder();
 
             // change application builder
         });
@@ -63,9 +61,15 @@ class WebApplicationFactoryWithHost<TEntryPoint> :
     {
         var hostBuilder = Host.CreateDefaultBuilder(args);
         // create startup with these configs
-        hostBuilder.ConfigureWebHostDefaults(webBuilder =>
+        hostBuilder.ConfigureWebHostDefaults((webBuilder) =>
         {
             webBuilder.ConfigureServices(configureServices);
+
+            //https://github.com/dotnet/aspnetcore/issues/37680#issuecomment-1331559463
+            //https://github.com/dotnet/aspnetcore/issues/45319#issuecomment-1334355103
+            // Set this so that the async context flows
+            configure.ConfigureTestApplicationBuilder();
+
             webBuilder.Configure(configure);
 
             WebHostBuilderCustomization?.Invoke(webBuilder);
