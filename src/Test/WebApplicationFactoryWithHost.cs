@@ -20,8 +20,10 @@ class WebApplicationFactoryWithHost<TEntryPoint> :
     public Action<IHostBuilder>? HostBuilderCustomization { get; set; }
     public Action<IWebHostBuilder>? WebHostBuilderCustomization { get; set; }
 
-    public WebApplicationFactoryWithHost(Action<IServiceCollection> configureServices,
-        Action<IApplicationBuilder> configure, string[]? args = null)
+    public WebApplicationFactoryWithHost(
+        Action<IServiceCollection> configureServices,
+        Action<IApplicationBuilder> configure,
+        string[]? args = null)
     {
         this.configureServices = configureServices;
         this.configure = configure;
@@ -35,11 +37,24 @@ class WebApplicationFactoryWithHost<TEntryPoint> :
             // change existing services ...
             if (TestOutputHelper != null)
                 services.AddLogging(b => b.AddXUnit(TestOutputHelper));
+
+            //https://github.com/dotnet/aspnetcore/issues/45319#issuecomment-1334355103
+            services.AddSingleton(configure);
         });
 
         builder.ConfigureTestServices(services =>
         {
             // change existing services ...
+        });
+
+        //https://github.com/dotnet/aspnetcore/issues/45319
+        builder.Configure(app =>
+        {
+            //https://github.com/dotnet/aspnetcore/issues/45319#issuecomment-1334355103
+            //calling test configure setup first
+            app.ApplicationServices.GetService<Action<IApplicationBuilder>>()?.Invoke(app);
+
+            // change application builder
         });
     }
 
