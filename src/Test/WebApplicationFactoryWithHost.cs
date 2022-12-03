@@ -20,8 +20,10 @@ class WebApplicationFactoryWithHost<TEntryPoint> :
     public Action<IHostBuilder>? HostBuilderCustomization { get; set; }
     public Action<IWebHostBuilder>? WebHostBuilderCustomization { get; set; }
 
-    public WebApplicationFactoryWithHost(Action<IServiceCollection> configureServices,
-        Action<IApplicationBuilder> configure, string[]? args = null)
+    public WebApplicationFactoryWithHost(
+        Action<IServiceCollection> configureServices,
+        Action<IApplicationBuilder> configure,
+        string[]? args = null)
     {
         this.configureServices = configureServices;
         this.configure = configure;
@@ -41,6 +43,17 @@ class WebApplicationFactoryWithHost<TEntryPoint> :
         {
             // change existing services ...
         });
+
+        //https://github.com/dotnet/aspnetcore/issues/45319
+        builder.Configure(app =>
+        {
+            //https://github.com/dotnet/aspnetcore/issues/37680#issuecomment-1331559463
+            //https://github.com/dotnet/aspnetcore/issues/45319#issuecomment-1334355103
+            //calling test configure setup first and then setup other configuration
+            app.AddTestApplicationBuilder();
+
+            // change application builder
+        });
     }
 
     // This creates a new host, when there is no program file (EntryPoint) for finding the CreateDefaultBuilder - this approach use for testing web components without startup or program
@@ -48,9 +61,15 @@ class WebApplicationFactoryWithHost<TEntryPoint> :
     {
         var hostBuilder = Host.CreateDefaultBuilder(args);
         // create startup with these configs
-        hostBuilder.ConfigureWebHostDefaults(webBuilder =>
+        hostBuilder.ConfigureWebHostDefaults((webBuilder) =>
         {
             webBuilder.ConfigureServices(configureServices);
+
+            //https://github.com/dotnet/aspnetcore/issues/37680#issuecomment-1331559463
+            //https://github.com/dotnet/aspnetcore/issues/45319#issuecomment-1334355103
+            // Set this so that the async context flows
+            configure.ConfigureTestApplicationBuilder();
+
             webBuilder.Configure(configure);
 
             WebHostBuilderCustomization?.Invoke(webBuilder);
